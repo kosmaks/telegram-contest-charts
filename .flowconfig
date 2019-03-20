@@ -1,0 +1,14 @@
+[ignore]
+.*/@parcel.*
+
+[include]
+src/
+
+[libs]
+
+[lints]
+
+[options]
+module.system.node.resolve_dirname=node_modules
+
+[strict]

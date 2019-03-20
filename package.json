@@ -1,0 +1,22 @@
+{
+  "name": "telechart",
+  "version": "1.0.0",
+  "description": "Chart library for Telegram contest",
+  "scripts": {
+    "dev": "parcel src/index.html",
+    "flow": "flow"
+  },
+  "keywords": [
+    "telegram",
+    "chart",
+    "graph"
+  ],
+  "author": "Max Kostuchenko (kstmaks@gmail.com)",
+  "license": "ISC",
+  "devDependencies": {
+    "babel-core": "^6.26.3",
+    "babel-plugin-transform-flow-strip-types": "^6.22.0",
+    "flow-cli": "0.0.0-pre",
+    "parcel": "^1.12.0"
+  }
+}
