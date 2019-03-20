@@ -10,6 +10,14 @@
   overflow: hidden;
 }
 
+.tc-slider canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
 .tc-slider-cover {
   background-color: #c0dcea;
   opacity: 0.2;

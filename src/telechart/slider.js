@@ -3,8 +3,9 @@
 import "./styles.css";
 
 import { Module, type State } from "./common";
+import { Preview } from "./preview";
 import { type Store } from "./store";
-import { clamp } from "./helpers";
+import { SvgPreview } from "./svg-preview";
 
 interface SliceSnapshot {
   start: number;
@@ -19,7 +20,8 @@ export class SliderModule extends Module {
     rightCover: HTMLDivElement,
     sliderWindow: HTMLDivElement,
     leftHandle: HTMLDivElement,
-    rightHandle: HTMLDivElement
+    rightHandle: HTMLDivElement,
+    preview: Preview
   };
 
   handleMouseMove: (ev: MouseEvent) => void;
@@ -30,6 +32,9 @@ export class SliderModule extends Module {
 
     const container = document.createElement("div");
     container.className = "tc-slider";
+
+    const preview = new Preview();
+    container.appendChild(preview.canvas);
 
     const leftCover = document.createElement("div");
     leftCover.className = "tc-slider-cover";
@@ -73,7 +78,8 @@ export class SliderModule extends Module {
       rightCover,
       sliderWindow,
       leftHandle,
-      rightHandle
+      rightHandle,
+      preview
     };
 
     state.containerEl.appendChild(container);
@@ -198,6 +204,9 @@ export class SliderModule extends Module {
     if (!elements) {
       return;
     }
+
+    const rect = elements.container.getBoundingClientRect();
+    elements.preview.render(state, rect.width, rect.height);
 
     const leftPercent = (state.slice.start * 100).toFixed(1) + "%";
     const rightPercent = (state.slice.end * 100).toFixed(1) + "%";

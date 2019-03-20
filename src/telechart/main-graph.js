@@ -9,39 +9,21 @@ export class MainGraphModule extends Module {
   canvas: ?HTMLCanvasElement;
   ctx: ?CanvasRenderingContext2D;
 
-  resizeHandler: () => void;
-
   didMount(store: Store<State>) {
     const state = store.getState();
 
     const rect = state.containerEl.getBoundingClientRect();
     const canvas = document.createElement("canvas");
-    canvas.width = rect.width * DPR;
-    canvas.height = rect.height * DPR;
-    canvas.style.width = `${rect.width}px`;
-    canvas.style.height = `${rect.height}px`;
     const ctx = canvas.getContext("2d");
     this.canvas = canvas;
     this.ctx = ctx;
     state.containerEl.appendChild(canvas);
-
-    this.resizeHandler = () => {
-      const updatedRect = store.getState().containerEl.getBoundingClientRect();
-      canvas.width = updatedRect.width * DPR;
-      canvas.height = updatedRect.height * DPR;
-      canvas.style.width = `${updatedRect.width}px`;
-      canvas.style.height = `${updatedRect.height}px`;
-    };
-
-    window.addEventListener("resize", this.resizeHandler);
   }
 
   willUnmount() {
     if (this.canvas) {
       this.canvas.remove();
     }
-
-    window.removeEventListener("resize", this.resizeHandler);
   }
 
   render(state: State) {
@@ -50,6 +32,12 @@ export class MainGraphModule extends Module {
     if (!ctx || !canvas) {
       return;
     }
+
+    const rect = state.containerEl.getBoundingClientRect();
+    canvas.width = rect.width * DPR;
+    canvas.height = rect.height * DPR;
+    canvas.style.width = `${rect.width}px`;
+    canvas.style.height = `${rect.height}px`;
 
     const first = state.primaryAxis.data[0];
     const last = state.primaryAxis.data[state.primaryAxis.data.length - 1];
@@ -104,7 +92,7 @@ export class MainGraphModule extends Module {
       }
 
       ctx.strokeStyle = lineAxis.color;
-      ctx.lineWidth = 3;
+      ctx.lineWidth = 2 * DPR;
       ctx.stroke();
       ctx.closePath();
     }

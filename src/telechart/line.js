@@ -16,6 +16,7 @@ interface Options {
 
 interface ChartAPI {
   remove: () => void;
+  redraw: () => void;
 }
 
 const TYPE_PRIMARY: "x" = "x";
@@ -96,15 +97,22 @@ export const createLineChart = (
     module.didMount(store);
   });
 
-  modules.forEach(module => {
-    module.render(store.getState());
-  });
+  const redraw = () => {
+    requestAnimationFrame(() => {
+      modules.forEach(module => {
+        module.render(store.getState());
+      });
+    });
+  };
+
+  redraw();
 
   return {
     remove: () => {
       modules.forEach(module => {
         module.willUnmount();
       });
-    }
+    },
+    redraw
   };
 };
