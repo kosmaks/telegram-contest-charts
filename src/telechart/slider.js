@@ -5,7 +5,6 @@ import "./styles.css";
 import { Module, type State } from "./common";
 import { Preview } from "./preview";
 import { type Store } from "./store";
-import { SvgPreview } from "./svg-preview";
 
 interface SliceSnapshot {
   start: number;
