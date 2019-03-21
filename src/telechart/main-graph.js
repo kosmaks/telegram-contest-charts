@@ -7,17 +7,24 @@ const DPR = (window.devicePixelRatio: number) || 1;
 
 export class MainGraphModule extends Module {
   canvas: ?HTMLCanvasElement;
+  container: ?HTMLDivElement;
   ctx: ?CanvasRenderingContext2D;
 
   didMount(store: Store<State>) {
     const state = store.getState();
+
+    const container = document.createElement("div");
+    container.style.height = state.mainHeight + "px";
+    this.container = container;
 
     const rect = state.containerEl.getBoundingClientRect();
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d");
     this.canvas = canvas;
     this.ctx = ctx;
-    state.containerEl.appendChild(canvas);
+
+    container.appendChild(canvas);
+    state.containerEl.appendChild(container);
   }
 
   willUnmount() {
@@ -27,13 +34,13 @@ export class MainGraphModule extends Module {
   }
 
   render(state: State) {
-    const { ctx, canvas } = this;
+    const { ctx, canvas, container } = this;
 
-    if (!ctx || !canvas) {
+    if (!ctx || !canvas || !container) {
       return;
     }
 
-    const rect = state.containerEl.getBoundingClientRect();
+    const rect = container.getBoundingClientRect();
     canvas.width = rect.width * DPR;
     canvas.height = rect.height * DPR;
     canvas.style.width = `${rect.width}px`;

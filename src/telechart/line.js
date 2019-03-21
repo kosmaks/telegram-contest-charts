@@ -76,6 +76,7 @@ export const createLineChart = (
 
   const store = createStore(
     ({
+      mainHeight: 300,
       containerEl,
       lineAxes,
       primaryAxis,

@@ -1,11 +1,16 @@
 import { setGlobalConfig, createLineChart } from "./telechart/line";
 import chartData from "./chart_data.json";
 
-const chart = createLineChart(document.getElementById("mychart"), {
-  columns: chartData[0].columns,
-  types: chartData[0].types,
-  names: chartData[0].names,
-  colors: chartData[0].colors
-});
+chartData.forEach(data => {
+  const element = document.createElement("div");
+  document.body.appendChild(element);
 
-window.addEventListener("resize", () => chart.redraw());
+  const chart = createLineChart(element, {
+    columns: data.columns,
+    types: data.types,
+    names: data.names,
+    colors: data.colors
+  });
+
+  window.addEventListener("resize", () => chart.redraw());
+});
