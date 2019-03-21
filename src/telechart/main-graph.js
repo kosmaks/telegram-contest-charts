@@ -2,6 +2,7 @@
 
 import { Module, type State } from "./common";
 import { type Store } from "./store";
+import { getTimeTicks, getValueTicks } from "./ticks";
 
 const DPR = (window.devicePixelRatio: number) || 1;
 
@@ -54,6 +55,7 @@ export class MainGraphModule extends Module {
     const endIdx = Math.ceil(length * state.slice.end);
 
     const minX = (last - first) * state.slice.start + first;
+    const maxX = (last - first) * state.slice.end + first;
     const xScale = (last - first) * (state.slice.end - state.slice.start);
 
     let minY: ?number;
@@ -70,12 +72,41 @@ export class MainGraphModule extends Module {
       }
     }
     if (minY == null || maxY == null) return;
-    const yScale = maxY - minY;
+
+    const yTicksData = getValueTicks({
+      min: minY,
+      max: maxY,
+      ticks: 6
+    });
+
+    const yScale = yTicksData.max - yTicksData.min;
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    const paddingTop = 20;
-    const paddingBottom = 20;
+    const timeTicks = getTimeTicks({
+      min: minX,
+      max: maxX,
+      width: canvas.width / DPR
+    });
+
+    const paddingTop = 20 * DPR;
+    const paddingBottom = 20 * DPR;
+
+    const xToScreen = (val: number) => (canvas.width * (val - minX)) / xScale;
+    const yToScreen = (val: number) =>
+      (1 - (val - yTicksData.min) / yScale) *
+      (canvas.height - paddingTop - paddingBottom + paddingTop);
+
+    yTicksData.ticks.forEach(tick => {
+      ctx.beginPath();
+      const cy = yToScreen(tick.position);
+      ctx.moveTo(0, cy);
+      ctx.lineTo(canvas.width, cy);
+      ctx.strokeStyle = "#F0F0F0";
+      ctx.lineWidth = 1 * DPR;
+      ctx.stroke();
+      ctx.closePath();
+    });
 
     for (let j = 0; j < state.lineAxes.length; ++j) {
       const lineAxis = state.lineAxes[j];
@@ -83,13 +114,10 @@ export class MainGraphModule extends Module {
 
       for (let i = startIdx; i <= endIdx; ++i) {
         const xValue = state.primaryAxis.data[i];
-        const x = (xValue - minX) / xScale;
-        const cx = x * canvas.width;
+        const cx = xToScreen(xValue);
 
         const yValue = lineAxis.data[i];
-        const y = (yValue - minY) / yScale;
-        const cy =
-          (1 - y) * (canvas.height - paddingTop - paddingBottom) + paddingTop;
+        const cy = yToScreen(yValue);
 
         if (i === startIdx) {
           ctx.moveTo(cx, cy);
@@ -103,5 +131,18 @@ export class MainGraphModule extends Module {
       ctx.stroke();
       ctx.closePath();
     }
+
+    ctx.font = `${12 * DPR}px sans-serif`;
+    ctx.fillStyle = "#C3C3C3";
+    yTicksData.ticks.forEach(tick => {
+      const cy = yToScreen(tick.position);
+      ctx.fillText(tick.label, 0, cy - 3 * DPR);
+    });
+
+    timeTicks.forEach(tick => {
+      const cy = canvas.height - paddingBottom + 14 * DPR;
+      const cx = xToScreen(tick.position);
+      ctx.fillText(tick.label, cx, cy);
+    });
   }
 }
