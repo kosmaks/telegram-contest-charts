@@ -1,3 +1,7 @@
+.tc-main-graph {
+  position: relative;
+}
+
 .tc-slider,
 .tc-slider * {
   box-sizing: border-box;
@@ -41,4 +45,40 @@
   height: 100%;
   width: 30px;
   margin-left: -15px;
+}
+
+.tc-popup {
+  position: absolute;
+  top: 10px;
+  padding: 7px 12px;
+  border-radius: 3px;
+  background: white;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.24);
+  min-width: 100px;
+  max-width: 40%;
+  pointer-events: none;
+}
+
+.tc-popup-date {
+  font-size: 14px;
+  margin-bottom: 3px;
+}
+
+.tc-popup-values {
+  display: flex;
+  position: relative;
+  flex-wrap: wrap;
+}
+
+.tc-popup-value {
+  display: inline-block;
+  font-size: 12px;
+  margin-top: 6px;
+  flex: 1 1 50%;
+}
+
+.tc-popup-value div {
+  font-size: 14px;
+  font-weight: bold;
+  margin-bottom: 3px;
 }

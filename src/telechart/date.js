@@ -1,5 +1,7 @@
 // @flow
 
+const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
 const months = [
   "Jan",
   "Feb",
@@ -17,6 +19,14 @@ const months = [
 
 const leadingZero = (val: number): string =>
   val < 10 ? `0${+val}` : `${+val}`;
+
+export const formatPreviewDate = (stamp: number): string => {
+  const date = new Date(stamp);
+  const day = days[date.getDay()];
+  const month = months[date.getMonth()];
+  const dayOfMonth = date.getDate();
+  return `${day}, ${month} ${dayOfMonth}`;
+};
 
 export const formatYear = (stamp: number): string => {
   const date = new Date(stamp);

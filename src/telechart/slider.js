@@ -170,7 +170,10 @@ export class SliderModule extends Module {
 
       const state = store.getState();
       store.putState(
-        Object.assign({}, state, { slice: { start: newStart, end: newEnd } })
+        Object.assign({}, state, {
+          slice: { start: newStart, end: newEnd },
+          hover: undefined
+        })
       );
     }
 
@@ -188,7 +191,8 @@ export class SliderModule extends Module {
       const state = store.getState();
       store.putState(
         Object.assign({}, state, {
-          slice: { start: newStart, end: leftSliceSnapshot.end }
+          slice: { start: newStart, end: leftSliceSnapshot.end },
+          hover: undefined
         })
       );
     }
@@ -207,7 +211,8 @@ export class SliderModule extends Module {
       const state = store.getState();
       store.putState(
         Object.assign({}, state, {
-          slice: { start: rightSliceSnapshot.start, end: newEnd }
+          slice: { start: rightSliceSnapshot.start, end: newEnd },
+          hover: undefined
         })
       );
     }

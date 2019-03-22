@@ -1,4 +1,6 @@
-import { setGlobalConfig, createLineChart } from "./telechart/line";
+import "./demo.css";
+
+import { createLineChart } from "./telechart/line";
 import chartData from "./chart_data.json";
 
 chartData.forEach(data => {

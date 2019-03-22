@@ -1,6 +1,7 @@
 // @flow
 
 import { Module, type State } from "./common";
+import { Popup } from "./popup";
 import { type Store } from "./store";
 import { clamp, findClosestIdx } from "./helpers";
 import { getTimeTicks, getValueTicks } from "./ticks";
@@ -11,6 +12,7 @@ export class MainGraphModule extends Module {
   canvas: ?HTMLCanvasElement;
   container: ?HTMLDivElement;
   ctx: ?CanvasRenderingContext2D;
+  popup: ?Popup;
 
   didMount(store: Store<State>) {
     const state = store.getState();
@@ -18,19 +20,27 @@ export class MainGraphModule extends Module {
     const container = document.createElement("div");
     container.style.height = state.mainHeight + "px";
     this.container = container;
+    this.container.className = "tc-main-graph";
 
     const rect = state.containerEl.getBoundingClientRect();
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d");
     this.canvas = canvas;
     this.ctx = ctx;
-
     canvas.addEventListener("mousemove", (e: MouseEvent) =>
       this.onMouseMove(store, e)
     );
-
+    canvas.addEventListener("touchmove", (e: TouchEvent) =>
+      this.onMouseMove(store, e)
+    );
+    canvas.addEventListener("mouseleave", (e: MouseEvent) =>
+      this.onMouseLeave(store, e)
+    );
     container.appendChild(canvas);
     state.containerEl.appendChild(container);
+
+    this.popup = new Popup();
+    container.appendChild(this.popup.popup);
   }
 
   willUnmount() {
@@ -39,14 +49,20 @@ export class MainGraphModule extends Module {
     }
   }
 
-  onMouseMove(store: Store<State>, ev: MouseEvent) {
+  onMouseMove(store: Store<State>, ev: MouseEvent | TouchEvent) {
     const { canvas } = this;
     if (!canvas) return;
     const state = store.getState();
 
+    if (ev instanceof TouchEvent && ev.touches.length <= 0) {
+      return;
+    }
+
+    const x = ev instanceof TouchEvent ? ev.touches[0].clientX : ev.clientX;
+
     const rect = canvas.getBoundingClientRect();
 
-    const percX = clamp((ev.clientX - rect.left) / rect.width);
+    const percX = clamp((x - rect.left) / rect.width);
 
     const first = state.primaryAxis.data[0];
     const last = state.primaryAxis.data[state.primaryAxis.data.length - 1];
@@ -71,12 +87,18 @@ export class MainGraphModule extends Module {
     }
   }
 
-  render(state: State) {
-    const { ctx, canvas, container } = this;
+  onMouseLeave(store: Store<State>, ev: MouseEvent) {
+    store.putState(Object.assign({}, store.getState(), { hover: undefined }));
+  }
 
-    if (!ctx || !canvas || !container) {
+  render(state: State) {
+    const { ctx, canvas, container, popup } = this;
+
+    if (!ctx || !canvas || !container || !popup) {
       return;
     }
+
+    popup.render(state, container);
 
     const rect = container.getBoundingClientRect();
     canvas.width = rect.width * DPR;
@@ -175,7 +197,21 @@ export class MainGraphModule extends Module {
       for (let j = 0; j < state.lineAxes.length; ++j) {
         const lineAxis = state.lineAxes[j];
         const cx = xToScreen(state.primaryAxis.data[idx]);
+
+        ctx.beginPath();
+        ctx.moveTo(cx, 0);
+        ctx.lineTo(cx, canvas.height);
+        ctx.strokeStyle = "#F0F0F0";
+        ctx.lineWidth = DPR;
+        ctx.stroke();
+        ctx.closePath();
+      }
+
+      for (let j = 0; j < state.lineAxes.length; ++j) {
+        const lineAxis = state.lineAxes[j];
+        const cx = xToScreen(state.primaryAxis.data[idx]);
         const cy = yToScreen(lineAxis.data[idx]);
+
         ctx.beginPath();
         ctx.clearRect(cx - 3 * DPR, cy - 3 * DPR, 6 * DPR, 6 * DPR);
         ctx.arc(cx, cy, 3 * DPR, 0, 2 * Math.PI);
