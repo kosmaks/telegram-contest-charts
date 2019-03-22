@@ -36,3 +36,21 @@ export class Module {
 
   render(state: State) {}
 }
+
+export const getMinX = (state: State) => {
+  const first = state.primaryAxis.data[0];
+  const last = state.primaryAxis.data[state.primaryAxis.data.length - 1];
+  return (last - first) * state.slice.start + first;
+};
+
+export const getMaxX = (state: State) => {
+  const first = state.primaryAxis.data[0];
+  const last = state.primaryAxis.data[state.primaryAxis.data.length - 1];
+  return (last - first) * state.slice.end + first;
+};
+
+export const getXScale = (state: State) => {
+  const first = state.primaryAxis.data[0];
+  const last = state.primaryAxis.data[state.primaryAxis.data.length - 1];
+  return (last - first) * (state.slice.end - state.slice.start);
+};

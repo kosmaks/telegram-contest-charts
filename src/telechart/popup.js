@@ -1,7 +1,7 @@
 // @flow
 
 import { type State } from "./common";
-import { clamp } from "./helpers";
+import { clamp, min } from "./helpers";
 import { formatPreviewDate } from "./date";
 
 export class Popup {
@@ -13,6 +13,7 @@ export class Popup {
     this.popup = document.createElement("div");
     this.popup.className = "tc-popup";
     this.popup.style.display = "none";
+    this.popup.style.opacity = "0";
 
     this.date = document.createElement("div");
     this.date.className = "tc-popup-date";
@@ -50,7 +51,13 @@ export class Popup {
     if (state.hover) {
       const idx = state.hover.idx;
 
-      this.popup.style.display = "block";
+      if (this.popup.style.display === "none") {
+        this.popup.style.display = "block";
+        this.popup.style.opacity = "0";
+        setTimeout(() => {
+          this.popup.style.opacity = "1";
+        }, 0);
+      }
       this.renderDate(state);
       this.renderValues(state);
 
@@ -61,13 +68,19 @@ export class Popup {
 
       const value = state.primaryAxis.data[idx];
       const containerWidth = container.getBoundingClientRect().width;
-      const width = this.popup.getBoundingClientRect().width;
+      const rect = this.popup.getBoundingClientRect();
+      const width = rect.width;
       const x = (containerWidth * (value - minX)) / xScale;
-      const offset = -width / 2;
-      const pos = clamp(x + offset, 20, containerWidth - width - 10);
+      let pos = x + 10;
+
+      if (pos > containerWidth - width - 10) {
+        pos = x - width - 10;
+      }
+
       this.popup.style.left = `${pos}px`;
     } else {
       this.popup.style.display = "none";
+      this.popup.style.opacity = "0";
     }
   }
 }

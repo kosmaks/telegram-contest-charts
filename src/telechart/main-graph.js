@@ -1,6 +1,6 @@
 // @flow
 
-import { Module, type State } from "./common";
+import { Module, type State, getMaxX, getMinX, getXScale } from "./common";
 import { Popup } from "./popup";
 import { type Store } from "./store";
 import { clamp, findClosestIdx } from "./helpers";
@@ -30,8 +30,14 @@ export class MainGraphModule extends Module {
     canvas.addEventListener("mousemove", (e: MouseEvent) =>
       this.onMouseMove(store, e)
     );
+    canvas.addEventListener("touchstart", (e: TouchEvent) =>
+      this.onMouseMove(store, e)
+    );
     canvas.addEventListener("touchmove", (e: TouchEvent) =>
       this.onMouseMove(store, e)
+    );
+    canvas.addEventListener("touchend", (e: TouchEvent) =>
+      this.onMouseLeave(store, e)
     );
     canvas.addEventListener("mouseleave", (e: MouseEvent) =>
       this.onMouseLeave(store, e)
@@ -49,10 +55,14 @@ export class MainGraphModule extends Module {
     }
   }
 
-  onMouseMove(store: Store<State>, ev: MouseEvent | TouchEvent) {
+  onMouseMove(store: Store<State>, ev: MouseEvent | TouchEvent, block = false) {
     const { canvas } = this;
     if (!canvas) return;
     const state = store.getState();
+
+    if (block) {
+      ev.preventDefault();
+    }
 
     if (ev instanceof TouchEvent && ev.touches.length <= 0) {
       return;
@@ -64,11 +74,8 @@ export class MainGraphModule extends Module {
 
     const percX = clamp((x - rect.left) / rect.width);
 
-    const first = state.primaryAxis.data[0];
-    const last = state.primaryAxis.data[state.primaryAxis.data.length - 1];
-    const minX = (last - first) * state.slice.start + first;
-    const maxX = (last - first) * state.slice.end + first;
-
+    const minX = getMinX(state);
+    const maxX = getMaxX(state);
     const value = percX * (maxX - minX) + minX;
 
     const length = state.primaryAxis.data.length - 1;
@@ -87,7 +94,8 @@ export class MainGraphModule extends Module {
     }
   }
 
-  onMouseLeave(store: Store<State>, ev: MouseEvent) {
+  onMouseLeave(store: Store<State>, ev: MouseEvent | TouchEvent) {
+    ev.preventDefault();
     store.putState(Object.assign({}, store.getState(), { hover: undefined }));
   }
 
@@ -98,24 +106,19 @@ export class MainGraphModule extends Module {
       return;
     }
 
-    popup.render(state, container);
-
     const rect = container.getBoundingClientRect();
     canvas.width = rect.width * DPR;
     canvas.height = rect.height * DPR;
     canvas.style.width = `${rect.width}px`;
     canvas.style.height = `${rect.height}px`;
 
-    const first = state.primaryAxis.data[0];
-    const last = state.primaryAxis.data[state.primaryAxis.data.length - 1];
-
     const length = state.primaryAxis.data.length - 1;
     const startIdx = Math.floor(length * state.slice.start);
     const endIdx = Math.ceil(length * state.slice.end);
 
-    const minX = (last - first) * state.slice.start + first;
-    const maxX = (last - first) * state.slice.end + first;
-    const xScale = (last - first) * (state.slice.end - state.slice.start);
+    const minX = getMinX(state);
+    const maxX = getMaxX(state);
+    const xScale = getXScale(state);
 
     let minY: ?number;
     let maxY: ?number;
@@ -130,7 +133,11 @@ export class MainGraphModule extends Module {
         }
       }
     }
-    if (minY == null || maxY == null) return;
+
+    if (minY == null || maxY == null) {
+      minY = 0;
+      maxY = 0;
+    }
 
     const yTicksData = getValueTicks({
       min: minY,
@@ -155,6 +162,8 @@ export class MainGraphModule extends Module {
     const yToScreen = (val: number) =>
       (1 - (val - yTicksData.min) / yScale) *
       (canvas.height - paddingTop - paddingBottom + paddingTop);
+
+    popup.render(state, container);
 
     yTicksData.ticks.forEach(tick => {
       ctx.beginPath();

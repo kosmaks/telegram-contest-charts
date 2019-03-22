@@ -3,6 +3,12 @@
 export const clamp = (value: number, low: number = 0, high: number = 1) =>
   Math.min(high, Math.max(low, value));
 
+export const min = (arr: number[]): number =>
+  arr.length <= 0 ? 0 : arr.reduce((acc, x) => (x < acc ? x : acc), arr[0]);
+
+export const max = (arr: number[]): number =>
+  arr.length <= 0 ? 0 : arr.reduce((acc, x) => (x > acc ? x : acc), arr[0]);
+
 const dist = (left: number, right: number): number => Math.abs(left - right);
 
 export const findClosestIdx = <T>(
