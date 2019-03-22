@@ -1,5 +1,18 @@
 // @flow
 
+export const toggleClass = (
+  current: string,
+  name: string,
+  on: boolean
+): string => {
+  const without = current
+    .split(" ")
+    .filter(x => x !== name)
+    .join(" ");
+  if (on) return without + " " + name;
+  return without;
+};
+
 export const clamp = (value: number, low: number = 0, high: number = 1) =>
   Math.min(high, Math.max(low, value));
 

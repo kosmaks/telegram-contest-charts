@@ -173,10 +173,12 @@ export class MainGraphModule extends Module {
       const cy = yToScreen(tick.position);
       ctx.moveTo(0, cy);
       ctx.lineTo(canvas.width, cy);
-      ctx.strokeStyle = "#F0F0F0";
+      ctx.globalAlpha = state.darkTheme ? 0.05 : 1;
+      ctx.strokeStyle = state.darkTheme ? "#FFFFFF" : "#F0F0F0";
       ctx.lineWidth = 1 * DPR;
       ctx.stroke();
       ctx.closePath();
+      ctx.globalAlpha = 1;
     });
 
     for (let j = 0; j < state.lineAxes.length; ++j) {
@@ -215,10 +217,12 @@ export class MainGraphModule extends Module {
         ctx.beginPath();
         ctx.moveTo(cx, 0);
         ctx.lineTo(cx, canvas.height);
-        ctx.strokeStyle = "#F0F0F0";
+        ctx.globalAlpha = state.darkTheme ? 0.1 : 1;
+        ctx.strokeStyle = state.darkTheme ? "#FFFFFF" : "#F0F0F0";
         ctx.lineWidth = DPR;
         ctx.stroke();
         ctx.closePath();
+        ctx.globalAlpha = 1;
       }
 
       for (let j = 0; j < state.lineAxes.length; ++j) {
@@ -239,7 +243,8 @@ export class MainGraphModule extends Module {
 
     ctx.font = `${12 * DPR}px sans-serif`;
     ctx.textAlign = "left";
-    ctx.fillStyle = "#C3C3C3";
+    ctx.globalAlpha = state.darkTheme ? 0.15 : 1;
+    ctx.fillStyle = state.darkTheme ? "#FFFFFF" : "#C3C3C3";
     yTicksData.ticks.forEach(tick => {
       const cy = yToScreen(tick.position);
       ctx.fillText(tick.label, 0, cy - 3 * DPR);
@@ -251,5 +256,6 @@ export class MainGraphModule extends Module {
       const cx = xToScreen(tick.position);
       ctx.fillText(tick.label, cx, cy);
     });
+    ctx.globalAlpha = 1;
   }
 }

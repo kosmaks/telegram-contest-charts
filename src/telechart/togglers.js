@@ -2,6 +2,7 @@
 
 import { State, Module } from "./common";
 import { Store } from "./store";
+import { toggleClass } from "./helpers";
 import checkmarkImg from "./checkmark.png";
 
 interface Toggler {
@@ -24,7 +25,11 @@ export class TogglersModule extends Module {
   }
 
   shouldUpdate(store: Store<State>, prevState: State) {
-    return store.getState().lineAxes !== prevState.lineAxes;
+    const state = store.getState();
+    return (
+      state.lineAxes !== prevState.lineAxes ||
+      state.darkTheme !== prevState.darkTheme
+    );
   }
 
   willUnmount() {
@@ -82,9 +87,11 @@ export class TogglersModule extends Module {
       const { color, name, hidden } = state.lineAxes[i];
       const { container, text, point } = togglers[i];
 
-      container.className = hidden
-        ? "tc-toggler"
-        : "tc-toggler tc-toggler--active";
+      container.className = toggleClass(
+        toggleClass("tc-toggler", "tc-toggler--active", !hidden),
+        "tc-dark",
+        state.darkTheme
+      );
       point.style.borderColor = color;
       text.innerHTML = name;
     }

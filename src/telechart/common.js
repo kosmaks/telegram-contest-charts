@@ -23,6 +23,7 @@ export interface State {
     end: number
   };
   hover: ?{ idx: number };
+  darkTheme: boolean;
 }
 
 export class Module {

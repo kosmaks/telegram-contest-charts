@@ -18,6 +18,7 @@ interface Options {
 interface ChartAPI {
   remove: () => void;
   redraw: () => void;
+  setDarkTheme: boolean => void;
 }
 
 const TYPE_PRIMARY: "x" = "x";
@@ -89,7 +90,8 @@ export const createLineChart = (
         start: 0.4,
         end: 0.8
       },
-      hover: undefined
+      hover: undefined,
+      darkTheme: false
     }: State),
     prevState => {
       modules.forEach(module => {
@@ -120,6 +122,8 @@ export const createLineChart = (
         module.willUnmount();
       });
     },
-    redraw
+    redraw,
+    setDarkTheme: (val: boolean) =>
+      store.putState(Object.assign({}, store.getState(), { darkTheme: val }))
   };
 };

@@ -1,7 +1,7 @@
 // @flow
 
 import { type State } from "./common";
-import { clamp, min } from "./helpers";
+import { clamp, min, toggleClass } from "./helpers";
 import { formatPreviewDate } from "./date";
 
 export class Popup {
@@ -51,6 +51,12 @@ export class Popup {
   render(state: State, container: HTMLElement) {
     if (state.hover && state.lineAxes.filter(x => !x.hidden).length > 0) {
       const idx = state.hover.idx;
+
+      this.popup.className = toggleClass(
+        this.popup.className,
+        "tc-dark",
+        state.darkTheme
+      );
 
       if (this.popup.style.display === "none") {
         this.popup.style.display = "block";

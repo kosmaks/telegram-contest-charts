@@ -5,6 +5,7 @@ import "./styles.css";
 import { Module, type State } from "./common";
 import { Preview } from "./preview";
 import { type Store } from "./store";
+import { toggleClass } from "./helpers";
 
 interface SliceSnapshot {
   start: number;
@@ -230,6 +231,12 @@ export class SliderModule extends Module {
     if (!elements) {
       return;
     }
+
+    elements.container.className = toggleClass(
+      elements.container.className,
+      "tc-dark",
+      state.darkTheme
+    );
 
     const rect = elements.container.getBoundingClientRect();
     elements.preview.render(state, rect.width, rect.height);
