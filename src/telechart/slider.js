@@ -12,6 +12,13 @@ interface SliceSnapshot {
   mouseX: number;
 }
 
+const getMouseX = (ev: MouseEvent | TouchEvent) =>
+  ev instanceof MouseEvent
+    ? ev.clientX
+    : ev instanceof TouchEvent && ev.touches.length > 0
+    ? ev.touches[0].clientX
+    : 0;
+
 export class SliderModule extends Module {
   elements: ?{
     container: HTMLDivElement,
@@ -23,7 +30,7 @@ export class SliderModule extends Module {
     preview: Preview
   };
 
-  handleMouseMove: (ev: MouseEvent) => void;
+  handleMouseMove: (ev: MouseEvent | TouchEvent) => void;
   handleMouseUp: (ev: MouseEvent) => void;
 
   didMount(store: Store<State>) {
@@ -48,6 +55,9 @@ export class SliderModule extends Module {
     const sliderWindow = document.createElement("div");
     sliderWindow.className = "tc-slider-window";
     container.appendChild(sliderWindow);
+    sliderWindow.addEventListener("touchstart", (e: TouchEvent) =>
+      this.onWindowMouseDown(store, e)
+    );
     sliderWindow.addEventListener("mousedown", (e: MouseEvent) =>
       this.onWindowMouseDown(store, e)
     );
@@ -55,6 +65,9 @@ export class SliderModule extends Module {
     const leftHandle = document.createElement("div");
     leftHandle.className = "tc-slider-handle";
     container.appendChild(leftHandle);
+    leftHandle.addEventListener("touchstart", (e: TouchEvent) =>
+      this.onLeftMouseDown(store, e)
+    );
     leftHandle.addEventListener("mousedown", (e: MouseEvent) =>
       this.onLeftMouseDown(store, e)
     );
@@ -62,13 +75,19 @@ export class SliderModule extends Module {
     const rightHandle = document.createElement("div");
     rightHandle.className = "tc-slider-handle";
     container.appendChild(rightHandle);
+    rightHandle.addEventListener("touchstart", (e: TouchEvent) =>
+      this.onRightMouseDown(store, e)
+    );
     rightHandle.addEventListener("mousedown", (e: MouseEvent) =>
       this.onRightMouseDown(store, e)
     );
 
     this.handleMouseUp = this.onMouseUp.bind(this);
-    this.handleMouseMove = (ev: MouseEvent) => this.onMouseMove(store, ev);
+    this.handleMouseMove = (ev: MouseEvent | TouchEvent) =>
+      this.onMouseMove(store, ev);
+    document.addEventListener("touchend", this.handleMouseUp);
     document.addEventListener("mouseup", this.handleMouseUp);
+    document.addEventListener("touchmove", this.handleMouseMove);
     document.addEventListener("mousemove", this.handleMouseMove);
 
     this.elements = {
@@ -91,31 +110,34 @@ export class SliderModule extends Module {
     document.removeEventListener("mouseup", this.handleMouseUp);
   }
 
-  getSliceSnapshot(store: Store<State>, ev: MouseEvent): SliceSnapshot {
+  getSliceSnapshot(
+    store: Store<State>,
+    ev: MouseEvent | TouchEvent
+  ): SliceSnapshot {
     const state = store.getState();
     return {
       start: state.slice.start,
       end: state.slice.end,
-      mouseX: ev.clientX
+      mouseX: getMouseX(ev)
     };
   }
 
   windowSliceSnapshot: ?SliceSnapshot;
-  onWindowMouseDown(store: Store<State>, ev: MouseEvent) {
+  onWindowMouseDown(store: Store<State>, ev: MouseEvent | TouchEvent) {
     this.windowSliceSnapshot = this.getSliceSnapshot(store, ev);
   }
 
   leftSliceSnapshot: ?SliceSnapshot;
-  onLeftMouseDown(store: Store<State>, ev: MouseEvent) {
+  onLeftMouseDown(store: Store<State>, ev: MouseEvent | TouchEvent) {
     this.leftSliceSnapshot = this.getSliceSnapshot(store, ev);
   }
 
   rightSliceSnapshot: ?SliceSnapshot;
-  onRightMouseDown(store: Store<State>, ev: MouseEvent) {
+  onRightMouseDown(store: Store<State>, ev: MouseEvent | TouchEvent) {
     this.rightSliceSnapshot = this.getSliceSnapshot(store, ev);
   }
 
-  onMouseMove(store: Store<State>, ev: MouseEvent) {
+  onMouseMove(store: Store<State>, ev: MouseEvent | TouchEvent) {
     const {
       elements,
       windowSliceSnapshot,
@@ -127,7 +149,7 @@ export class SliderModule extends Module {
     if (windowSliceSnapshot) {
       const rect = elements.container.getBoundingClientRect();
       const oldX = (windowSliceSnapshot.mouseX - rect.left) / rect.width;
-      const newX = (ev.clientX - rect.left) / rect.width;
+      const newX = (getMouseX(ev) - rect.left) / rect.width;
       const diff = newX - oldX;
       let newStart = windowSliceSnapshot.start + diff;
       let newEnd = windowSliceSnapshot.end + diff;
@@ -155,7 +177,7 @@ export class SliderModule extends Module {
     if (leftSliceSnapshot) {
       const rect = elements.container.getBoundingClientRect();
       const oldX = (leftSliceSnapshot.mouseX - rect.left) / rect.width;
-      const newX = (ev.clientX - rect.left) / rect.width;
+      const newX = (getMouseX(ev) - rect.left) / rect.width;
       const diff = newX - oldX;
       let newStart = Math.max(0, leftSliceSnapshot.start + diff);
 
@@ -174,7 +196,7 @@ export class SliderModule extends Module {
     if (rightSliceSnapshot) {
       const rect = elements.container.getBoundingClientRect();
       const oldX = (rightSliceSnapshot.mouseX - rect.left) / rect.width;
-      const newX = (ev.clientX - rect.left) / rect.width;
+      const newX = (getMouseX(ev) - rect.left) / rect.width;
       const diff = newX - oldX;
       let newEnd = Math.min(1, rightSliceSnapshot.end + diff);
 
@@ -191,7 +213,7 @@ export class SliderModule extends Module {
     }
   }
 
-  onMouseUp(ev: MouseEvent) {
+  onMouseUp(ev: MouseEvent | TouchEvent) {
     this.windowSliceSnapshot = undefined;
     this.leftSliceSnapshot = undefined;
     this.rightSliceSnapshot = undefined;
