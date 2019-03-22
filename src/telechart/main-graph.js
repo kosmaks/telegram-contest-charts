@@ -55,16 +55,15 @@ export class MainGraphModule extends Module {
     }
   }
 
-  onMouseMove(store: Store<State>, ev: MouseEvent | TouchEvent, block = false) {
+  onMouseMove(store: Store<State>, ev: MouseEvent | TouchEvent) {
     const { canvas } = this;
     if (!canvas) return;
     const state = store.getState();
 
-    if (block) {
-      ev.preventDefault();
-    }
-
-    if (ev instanceof TouchEvent && ev.touches.length <= 0) {
+    if (
+      ev instanceof TouchEvent &&
+      (ev.touches.length <= 0 || !ev.cancelable)
+    ) {
       return;
     }
 
@@ -95,7 +94,9 @@ export class MainGraphModule extends Module {
   }
 
   onMouseLeave(store: Store<State>, ev: MouseEvent | TouchEvent) {
-    ev.preventDefault();
+    if (ev.cancelable) {
+      ev.preventDefault();
+    }
     store.putState(Object.assign({}, store.getState(), { hover: undefined }));
   }
 
@@ -124,6 +125,8 @@ export class MainGraphModule extends Module {
     let maxY: ?number;
     for (let i = startIdx; i <= endIdx; ++i) {
       for (let axis of state.lineAxes) {
+        if (axis.hidden) continue;
+
         const value = axis.data[i];
         if (minY == null || value < minY) {
           minY = value;
@@ -178,6 +181,7 @@ export class MainGraphModule extends Module {
 
     for (let j = 0; j < state.lineAxes.length; ++j) {
       const lineAxis = state.lineAxes[j];
+      if (lineAxis.hidden) continue;
       ctx.beginPath();
 
       for (let i = startIdx; i <= endIdx; ++i) {
@@ -205,6 +209,7 @@ export class MainGraphModule extends Module {
 
       for (let j = 0; j < state.lineAxes.length; ++j) {
         const lineAxis = state.lineAxes[j];
+        if (lineAxis.hidden) continue;
         const cx = xToScreen(state.primaryAxis.data[idx]);
 
         ctx.beginPath();
@@ -218,6 +223,7 @@ export class MainGraphModule extends Module {
 
       for (let j = 0; j < state.lineAxes.length; ++j) {
         const lineAxis = state.lineAxes[j];
+        if (lineAxis.hidden) continue;
         const cx = xToScreen(state.primaryAxis.data[idx]);
         const cy = yToScreen(lineAxis.data[idx]);
 

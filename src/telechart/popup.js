@@ -34,6 +34,7 @@ export class Popup {
   renderValues(state: State) {
     if (state.hover) {
       this.values.innerHTML = state.lineAxes
+        .filter(axis => !axis.hidden)
         .map(axis => {
           const value = state.hover ? axis.data[state.hover.idx] : 0;
           return (
@@ -48,7 +49,7 @@ export class Popup {
   }
 
   render(state: State, container: HTMLElement) {
-    if (state.hover) {
+    if (state.hover && state.lineAxes.filter(x => !x.hidden).length > 0) {
       const idx = state.hover.idx;
 
       if (this.popup.style.display === "none") {

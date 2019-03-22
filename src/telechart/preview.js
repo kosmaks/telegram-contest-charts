@@ -34,6 +34,8 @@ export class Preview {
     let maxY: ?number;
 
     state.lineAxes.forEach(axis => {
+      if (axis.hidden) return;
+
       axis.data.forEach(val => {
         if (minY == null || val < minY) {
           minY = val;
@@ -45,13 +47,17 @@ export class Preview {
       });
     });
 
-    if (minY == null || maxY == null) return;
+    if (minY == null || maxY == null) {
+      minY = 0;
+      maxY = 0;
+    }
 
     const xScale = maxX - minX;
     const yScale = maxY - minY;
 
     for (let j = 0; j < state.lineAxes.length; ++j) {
       const axis = state.lineAxes[j];
+      if (axis.hidden) continue;
 
       ctx.beginPath();
 

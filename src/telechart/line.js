@@ -3,6 +3,7 @@
 import { MainGraphModule } from "./main-graph";
 import { Module, type State, type PrimaryAxis, type LineAxis } from "./common";
 import { SliderModule } from "./slider";
+import { TogglersModule } from "./togglers";
 import { createStore } from "./store";
 
 type Container = string | HTMLElement;
@@ -72,7 +73,11 @@ export const createLineChart = (
     });
   });
 
-  const modules: Module[] = [new MainGraphModule(), new SliderModule()];
+  const modules: Module[] = [
+    new MainGraphModule(),
+    new SliderModule(),
+    new TogglersModule()
+  ];
 
   const store = createStore(
     ({
