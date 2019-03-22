@@ -83,7 +83,8 @@ export const createLineChart = (
       slice: {
         start: 0.4,
         end: 0.8
-      }
+      },
+      hover: undefined
     }: State),
     prevState => {
       modules.forEach(module => {

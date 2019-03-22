@@ -22,6 +22,7 @@ export interface State {
     start: number,
     end: number
   };
+  hover: ?{ idx: number };
 }
 
 export class Module {

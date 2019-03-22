@@ -7,6 +7,11 @@ chartData.forEach(data => {
 
   const chart = createLineChart(element, {
     columns: data.columns,
+    // columns: data.columns.map(x =>
+    //   x
+    //     .slice(0, Math.round(x.length * 0.3))
+    //     .concat(x.slice(Math.round(x.length * 0.7), -1))
+    // ),
     types: data.types,
     names: data.names,
     colors: data.colors

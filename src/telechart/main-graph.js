@@ -2,6 +2,7 @@
 
 import { Module, type State } from "./common";
 import { type Store } from "./store";
+import { clamp, findClosestIdx } from "./helpers";
 import { getTimeTicks, getValueTicks } from "./ticks";
 
 const DPR = (window.devicePixelRatio: number) || 1;
@@ -24,6 +25,10 @@ export class MainGraphModule extends Module {
     this.canvas = canvas;
     this.ctx = ctx;
 
+    canvas.addEventListener("mousemove", (e: MouseEvent) =>
+      this.onMouseMove(store, e)
+    );
+
     container.appendChild(canvas);
     state.containerEl.appendChild(container);
   }
@@ -31,6 +36,38 @@ export class MainGraphModule extends Module {
   willUnmount() {
     if (this.canvas) {
       this.canvas.remove();
+    }
+  }
+
+  onMouseMove(store: Store<State>, ev: MouseEvent) {
+    const { canvas } = this;
+    if (!canvas) return;
+    const state = store.getState();
+
+    const rect = canvas.getBoundingClientRect();
+
+    const percX = clamp((ev.clientX - rect.left) / rect.width);
+
+    const first = state.primaryAxis.data[0];
+    const last = state.primaryAxis.data[state.primaryAxis.data.length - 1];
+    const minX = (last - first) * state.slice.start + first;
+    const maxX = (last - first) * state.slice.end + first;
+
+    const value = percX * (maxX - minX) + minX;
+
+    const length = state.primaryAxis.data.length - 1;
+    const startIdx = Math.floor(length * state.slice.start);
+    const endIdx = Math.ceil(length * state.slice.end);
+
+    const closestIdx = findClosestIdx(
+      state.primaryAxis.data,
+      value,
+      startIdx,
+      endIdx
+    );
+
+    if (closestIdx >= 0 && (!state.hover || state.hover.idx !== closestIdx)) {
+      store.putState(Object.assign({}, state, { hover: { idx: closestIdx } }));
     }
   }
 
@@ -132,13 +169,32 @@ export class MainGraphModule extends Module {
       ctx.closePath();
     }
 
+    if (state.hover) {
+      const idx = state.hover.idx;
+
+      for (let j = 0; j < state.lineAxes.length; ++j) {
+        const lineAxis = state.lineAxes[j];
+        const cx = xToScreen(state.primaryAxis.data[idx]);
+        const cy = yToScreen(lineAxis.data[idx]);
+        ctx.beginPath();
+        ctx.clearRect(cx - 3 * DPR, cy - 3 * DPR, 6 * DPR, 6 * DPR);
+        ctx.arc(cx, cy, 3 * DPR, 0, 2 * Math.PI);
+        ctx.strokeStyle = lineAxis.color;
+        ctx.lineWidth = 2 * DPR;
+        ctx.stroke();
+        ctx.closePath();
+      }
+    }
+
     ctx.font = `${12 * DPR}px sans-serif`;
+    ctx.textAlign = "left";
     ctx.fillStyle = "#C3C3C3";
     yTicksData.ticks.forEach(tick => {
       const cy = yToScreen(tick.position);
       ctx.fillText(tick.label, 0, cy - 3 * DPR);
     });
 
+    ctx.textAlign = "center";
     timeTicks.forEach(tick => {
       const cy = canvas.height - paddingBottom + 14 * DPR;
       const cx = xToScreen(tick.position);
