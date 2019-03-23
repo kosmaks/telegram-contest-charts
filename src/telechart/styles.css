@@ -2,6 +2,8 @@
   position: relative;
   -webkit-tap-highlight-color: transparent;
   user-select: none;
+  padding: 0 15px;
+  margin: 0 -15px;
 }
 
 .tc-main-graph-title {

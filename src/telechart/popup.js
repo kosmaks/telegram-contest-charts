@@ -78,7 +78,7 @@ export class Popup {
       const containerWidth = container.getBoundingClientRect().width;
       const rect = this.popup.getBoundingClientRect();
       const width = rect.width;
-      const x = (containerWidth * (value - minX)) / xScale;
+      const x = ((containerWidth - 30) * (value - minX)) / xScale + 15;
       let pos = x + 10;
 
       if (pos > containerWidth - width - 10) {

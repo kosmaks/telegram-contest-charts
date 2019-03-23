@@ -39,23 +39,24 @@ export class MainGraphModule extends Module {
     const rect = state.containerEl.getBoundingClientRect();
     const canvas = document.createElement("canvas");
     this.canvas = canvas;
-    canvas.addEventListener("mousemove", (e: MouseEvent) =>
-      this.onMouseMove(store, e)
-    );
-    canvas.addEventListener("touchstart", (e: TouchEvent) =>
-      this.onMouseMove(store, e)
-    );
-    canvas.addEventListener("touchmove", (e: TouchEvent) =>
-      this.onMouseMove(store, e)
-    );
-    canvas.addEventListener("touchend", (e: TouchEvent) =>
-      this.onMouseLeave(store, e)
-    );
-    canvas.addEventListener("mouseleave", (e: MouseEvent) =>
-      this.onMouseLeave(store, e)
-    );
     container.appendChild(canvas);
     state.containerEl.appendChild(container);
+
+    container.addEventListener("mousemove", (e: MouseEvent) =>
+      this.onMouseMove(store, e)
+    );
+    container.addEventListener("touchstart", (e: TouchEvent) =>
+      this.onMouseMove(store, e)
+    );
+    container.addEventListener("touchmove", (e: TouchEvent) =>
+      this.onMouseMove(store, e)
+    );
+    container.addEventListener("touchend", (e: TouchEvent) =>
+      this.onMouseLeave(store, e)
+    );
+    container.addEventListener("mouseleave", (e: MouseEvent) =>
+      this.onMouseLeave(store, e)
+    );
 
     this.popup = new Popup();
     container.appendChild(this.popup.popup);
@@ -133,7 +134,7 @@ export class MainGraphModule extends Module {
     if (rect.width !== this.lastWidth || rect.height !== this.lastHeight) {
       canvas.width = rect.width * DPR;
       canvas.height = rect.height * DPR;
-      canvas.style.width = `${rect.width}px`;
+      canvas.style.width = `${rect.width - 30}px`;
       canvas.style.height = `${rect.height}px`;
       this.lastWidth = rect.width;
       this.lastHeight = rect.height;
