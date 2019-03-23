@@ -52,7 +52,7 @@ export class TogglersModule extends Module {
 
     for (let i = 0; i < count; ++i) {
       const toggler = document.createElement("div");
-      toggler.className = "tc-toggler";
+      toggler.className = "tc-toggler tc-toggler--active";
       toggler.addEventListener("click", () => this.onToggle(i));
 
       const point = document.createElement("div");
@@ -87,10 +87,17 @@ export class TogglersModule extends Module {
       const { color, name, hidden } = state.lineAxes[i];
       const { container, text, point } = togglers[i];
 
+      const hasActive = !!container.className.match(/active/i);
+      const manual = (!hidden && !hasActive) || (hidden && hasActive);
+
       container.className = toggleClass(
-        toggleClass("tc-toggler", "tc-toggler--active", !hidden),
-        "tc-dark",
-        state.darkTheme
+        toggleClass(
+          toggleClass("tc-toggler", "tc-toggler--active", !hidden),
+          "tc-dark",
+          state.darkTheme
+        ),
+        "tc-toggler--manual",
+        manual
       );
       point.style.borderColor = color;
       text.innerHTML = name;
