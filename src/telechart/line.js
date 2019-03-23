@@ -67,6 +67,7 @@ export const createLineChart = (
     const color = colors[id] || "red";
 
     lineAxes.push({
+      id,
       data,
       name: typeof name === "string" ? name : "",
       color: typeof color === "string" ? color : "",

@@ -1,5 +1,6 @@
 // @flow
 
+import { CanvasRenderer, type Frame } from "./canvas-renderer";
 import { Module, type State, getMaxX, getMinX, getXScale } from "./common";
 import { Popup } from "./popup";
 import { type Store } from "./store";
@@ -11,8 +12,8 @@ const DPR = (window.devicePixelRatio: number) || 1;
 export class MainGraphModule extends Module {
   canvas: ?HTMLCanvasElement;
   container: ?HTMLDivElement;
-  ctx: ?CanvasRenderingContext2D;
   popup: ?Popup;
+  renderer: ?CanvasRenderer;
 
   didMount(store: Store<State>) {
     const state = store.getState();
@@ -24,9 +25,7 @@ export class MainGraphModule extends Module {
 
     const rect = state.containerEl.getBoundingClientRect();
     const canvas = document.createElement("canvas");
-    const ctx = canvas.getContext("2d");
     this.canvas = canvas;
-    this.ctx = ctx;
     canvas.addEventListener("mousemove", (e: MouseEvent) =>
       this.onMouseMove(store, e)
     );
@@ -47,6 +46,8 @@ export class MainGraphModule extends Module {
 
     this.popup = new Popup();
     container.appendChild(this.popup.popup);
+
+    this.renderer = new CanvasRenderer(canvas);
   }
 
   willUnmount() {
@@ -101,11 +102,13 @@ export class MainGraphModule extends Module {
   }
 
   render(state: State) {
-    const { ctx, canvas, container, popup } = this;
+    const { renderer, canvas, container, popup } = this;
 
-    if (!ctx || !canvas || !container || !popup) {
+    if (!canvas || !container || !popup || !renderer) {
       return;
     }
+
+    popup.render(state, container);
 
     const rect = container.getBoundingClientRect();
     canvas.width = rect.width * DPR;
@@ -150,112 +153,33 @@ export class MainGraphModule extends Module {
 
     const yScale = yTicksData.max - yTicksData.min;
 
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
     const timeTicks = getTimeTicks({
       min: minX,
       max: maxX,
       width: canvas.width / DPR
     });
 
-    const paddingTop = 20 * DPR;
-    const paddingBottom = 20 * DPR;
+    const frame: Frame = {
+      primaryAxis: state.primaryAxis,
+      lineAxes: state.lineAxes,
+      startIdx,
+      endIdx,
 
-    const xToScreen = (val: number) => (canvas.width * (val - minX)) / xScale;
-    const yToScreen = (val: number) =>
-      (1 - (val - yTicksData.min) / yScale) *
-      (canvas.height - paddingTop - paddingBottom + paddingTop);
+      yTicks: yTicksData.ticks,
+      timeTicks: timeTicks,
 
-    popup.render(state, container);
+      minX,
+      xScale,
+      minY: yTicksData.min,
+      yScale,
 
-    yTicksData.ticks.forEach(tick => {
-      ctx.beginPath();
-      const cy = yToScreen(tick.position);
-      ctx.moveTo(0, cy);
-      ctx.lineTo(canvas.width, cy);
-      ctx.globalAlpha = state.darkTheme ? 0.05 : 1;
-      ctx.strokeStyle = state.darkTheme ? "#FFFFFF" : "#F0F0F0";
-      ctx.lineWidth = 1 * DPR;
-      ctx.stroke();
-      ctx.closePath();
-      ctx.globalAlpha = 1;
-    });
+      darkTheme: state.darkTheme,
+      paddingTop: 20,
+      paddingBottom: 20,
 
-    for (let j = 0; j < state.lineAxes.length; ++j) {
-      const lineAxis = state.lineAxes[j];
-      if (lineAxis.hidden) continue;
-      ctx.beginPath();
+      hover: state.hover
+    };
 
-      for (let i = startIdx; i <= endIdx; ++i) {
-        const xValue = state.primaryAxis.data[i];
-        const cx = xToScreen(xValue);
-
-        const yValue = lineAxis.data[i];
-        const cy = yToScreen(yValue);
-
-        if (i === startIdx) {
-          ctx.moveTo(cx, cy);
-        } else {
-          ctx.lineTo(cx, cy);
-        }
-      }
-
-      ctx.strokeStyle = lineAxis.color;
-      ctx.lineWidth = 2 * DPR;
-      ctx.stroke();
-      ctx.closePath();
-    }
-
-    if (state.hover) {
-      const idx = state.hover.idx;
-
-      for (let j = 0; j < state.lineAxes.length; ++j) {
-        const lineAxis = state.lineAxes[j];
-        if (lineAxis.hidden) continue;
-        const cx = xToScreen(state.primaryAxis.data[idx]);
-
-        ctx.beginPath();
-        ctx.moveTo(cx, 0);
-        ctx.lineTo(cx, canvas.height);
-        ctx.globalAlpha = state.darkTheme ? 0.1 : 1;
-        ctx.strokeStyle = state.darkTheme ? "#FFFFFF" : "#F0F0F0";
-        ctx.lineWidth = DPR;
-        ctx.stroke();
-        ctx.closePath();
-        ctx.globalAlpha = 1;
-      }
-
-      for (let j = 0; j < state.lineAxes.length; ++j) {
-        const lineAxis = state.lineAxes[j];
-        if (lineAxis.hidden) continue;
-        const cx = xToScreen(state.primaryAxis.data[idx]);
-        const cy = yToScreen(lineAxis.data[idx]);
-
-        ctx.beginPath();
-        ctx.clearRect(cx - 3 * DPR, cy - 3 * DPR, 6 * DPR, 6 * DPR);
-        ctx.arc(cx, cy, 3 * DPR, 0, 2 * Math.PI);
-        ctx.strokeStyle = lineAxis.color;
-        ctx.lineWidth = 2 * DPR;
-        ctx.stroke();
-        ctx.closePath();
-      }
-    }
-
-    ctx.font = `${12 * DPR}px sans-serif`;
-    ctx.textAlign = "left";
-    ctx.globalAlpha = state.darkTheme ? 0.15 : 1;
-    ctx.fillStyle = state.darkTheme ? "#FFFFFF" : "#C3C3C3";
-    yTicksData.ticks.forEach(tick => {
-      const cy = yToScreen(tick.position);
-      ctx.fillText(tick.label, 0, cy - 3 * DPR);
-    });
-
-    ctx.textAlign = "center";
-    timeTicks.forEach(tick => {
-      const cy = canvas.height - paddingBottom + 14 * DPR;
-      const cx = xToScreen(tick.position);
-      ctx.fillText(tick.label, cx, cy);
-    });
-    ctx.globalAlpha = 1;
+    renderer.animateTo(frame);
   }
 }

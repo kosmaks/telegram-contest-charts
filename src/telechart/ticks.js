@@ -22,7 +22,8 @@ interface TimeTicksRequest {
   width: number;
 }
 
-interface Tick {
+export interface Tick {
+  id: string;
   position: number;
   label: string;
 }
@@ -53,7 +54,7 @@ export const getValueTicks = (data: ValueTicksRequest): TicksResponse => {
     return {
       min: -1,
       max: 1,
-      ticks: [{ position: 0, label: "0" }]
+      ticks: [{ id: "0", position: 0, label: "0" }]
     };
   }
 
@@ -68,6 +69,7 @@ export const getValueTicks = (data: ValueTicksRequest): TicksResponse => {
   for (let i = 0; i < data.ticks; ++i) {
     const value = roundNums(lowBound + step * i, logSpread);
     result.push({
+      id: String(value),
       position: value,
       label: String(value)
     });
@@ -135,6 +137,7 @@ export const getTimeTicks = (data: TimeTicksRequest): Tick[] => {
   let stamp = Math.floor(data.min / (size * step)) * step * size;
   while (stamp <= data.max) {
     ticks.push({
+      id: `${stamp}`,
       position: stamp,
       label: format(stamp)
     });

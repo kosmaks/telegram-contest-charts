@@ -7,6 +7,7 @@ export interface PrimaryAxis {
 }
 
 export interface LineAxis {
+  id: string;
   data: number[];
   name: string;
   color: string;
