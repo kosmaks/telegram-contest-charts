@@ -213,6 +213,23 @@ export class CanvasRenderer {
     ctx.globalAlpha = 1;
   }
 
+  renderFade() {
+    const { currentFrame: frame, canvas, ctx } = this;
+
+    ctx.globalCompositeOperation = "destination-in";
+
+    const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+    grad.addColorStop(0, "transparent");
+    grad.addColorStop((frame.paddingTop * DPR) / canvas.height, "#FFF");
+    grad.addColorStop(1, "#FFF");
+
+    ctx.fillStyle = grad;
+
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.globalCompositeOperation = "source-over";
+  }
+
   renderFrame() {
     const { canvas, ctx } = this;
 
@@ -222,6 +239,7 @@ export class CanvasRenderer {
     this.renderHover();
     this.renderYLabels();
     this.renderXLabels();
+    this.renderFade();
   }
 
   renderLoop(timestamp: number) {

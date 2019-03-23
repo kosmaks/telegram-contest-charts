@@ -68,13 +68,13 @@ export class MainGraphModule extends Module {
     const state = store.getState();
 
     if (
-      ev instanceof TouchEvent &&
+      !(ev instanceof MouseEvent) &&
       (ev.touches.length <= 0 || !ev.cancelable)
     ) {
       return;
     }
 
-    const x = ev instanceof TouchEvent ? ev.touches[0].clientX : ev.clientX;
+    const x = !(ev instanceof MouseEvent) ? ev.touches[0].clientX : ev.clientX;
 
     const rect = canvas.getBoundingClientRect();
 

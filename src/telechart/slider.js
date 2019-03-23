@@ -16,7 +16,7 @@ interface SliceSnapshot {
 const getMouseX = (ev: MouseEvent | TouchEvent) =>
   ev instanceof MouseEvent
     ? ev.clientX
-    : ev instanceof TouchEvent && ev.touches.length > 0
+    : ev.touches.length > 0
     ? ev.touches[0].clientX
     : 0;
 
