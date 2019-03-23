@@ -1,5 +1,7 @@
 .tc-main-graph {
   position: relative;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
 }
 
 .tc-main-graph-title {
@@ -28,6 +30,8 @@
   position: relative;
   margin-top: 10px;
   overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
 }
 
 .tc-slider canvas {
@@ -131,6 +135,8 @@
   margin-top: 10px;
   cursor: pointer;
   color: #43484b;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
 }
 .tc-toggler.tc-dark {
   border-color: rgba(255, 255, 255, 0.2);

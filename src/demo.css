@@ -7,6 +7,15 @@ html {
   text-align: center;
 }
 
+body,
+* {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
 body.dark {
   background-color: rgb(36, 47, 62);
 }

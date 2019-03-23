@@ -148,6 +148,7 @@ export class SliderModule extends Module {
     if (!elements) return;
 
     if (windowSliceSnapshot) {
+      ev.preventDefault();
       const rect = elements.container.getBoundingClientRect();
       const oldX = (windowSliceSnapshot.mouseX - rect.left) / rect.width;
       const newX = (getMouseX(ev) - rect.left) / rect.width;
@@ -179,6 +180,7 @@ export class SliderModule extends Module {
     }
 
     if (leftSliceSnapshot) {
+      ev.preventDefault();
       const rect = elements.container.getBoundingClientRect();
       const oldX = (leftSliceSnapshot.mouseX - rect.left) / rect.width;
       const newX = (getMouseX(ev) - rect.left) / rect.width;
@@ -199,6 +201,7 @@ export class SliderModule extends Module {
     }
 
     if (rightSliceSnapshot) {
+      ev.preventDefault();
       const rect = elements.container.getBoundingClientRect();
       const oldX = (rightSliceSnapshot.mouseX - rect.left) / rect.width;
       const newX = (getMouseX(ev) - rect.left) / rect.width;
