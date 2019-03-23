@@ -36,6 +36,7 @@ export interface Frame extends StaticFrame {
 }
 
 const ANIMATION_DURATION = 100;
+const LONG_ANIMATION_DURATION = 300;
 
 export class CanvasRenderer {
   canvas: HTMLCanvasElement;
@@ -228,11 +229,12 @@ export class CanvasRenderer {
 
     if (renderTime > 0) {
       const step = diff / ANIMATION_DURATION;
+      const longStep = diff / LONG_ANIMATION_DURATION;
       this.minY.step(step);
       this.yScale.step(step);
       this.lineAxes.step(step);
       this.yTicks.step(step);
-      this.timeTicks.step(diff / 300);
+      this.timeTicks.step(longStep);
 
       this.renderFrame();
       this.renderTime -= diff;
@@ -248,6 +250,6 @@ export class CanvasRenderer {
     this.yTicks.putValues(frame.yTicks);
     this.timeTicks.putValues(frame.timeTicks);
     this.currentFrame = frame;
-    this.renderTime = ANIMATION_DURATION;
+    this.renderTime = LONG_ANIMATION_DURATION;
   }
 }

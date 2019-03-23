@@ -15,8 +15,14 @@ export class MainGraphModule extends Module {
   popup: ?Popup;
   renderer: ?CanvasRenderer;
 
+  lastWidth: ?number;
+  lastHeight: ?number;
+
   didMount(store: Store<State>) {
     const state = store.getState();
+
+    this.lastWidth = 0;
+    this.lastHeight = 0;
 
     const container = document.createElement("div");
     container.style.height = state.mainHeight + "px";
@@ -111,10 +117,14 @@ export class MainGraphModule extends Module {
     popup.render(state, container);
 
     const rect = container.getBoundingClientRect();
-    canvas.width = rect.width * DPR;
-    canvas.height = rect.height * DPR;
-    canvas.style.width = `${rect.width}px`;
-    canvas.style.height = `${rect.height}px`;
+    if (rect.width !== this.lastWidth || rect.height !== this.lastHeight) {
+      canvas.width = rect.width * DPR;
+      canvas.height = rect.height * DPR;
+      canvas.style.width = `${rect.width}px`;
+      canvas.style.height = `${rect.height}px`;
+      this.lastWidth = rect.width;
+      this.lastHeight = rect.height;
+    }
 
     const length = state.primaryAxis.data.length - 1;
     const startIdx = Math.floor(length * state.slice.start);
