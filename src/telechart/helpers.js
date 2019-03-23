@@ -13,6 +13,9 @@ export const toggleClass = (
   return without;
 };
 
+export const nextPowOf2 = (value: number) =>
+  Math.pow(2, Math.ceil(Math.log(value) / Math.log(2)));
+
 export const clamp = (value: number, low: number = 0, high: number = 1) =>
   Math.min(high, Math.max(low, value));
 

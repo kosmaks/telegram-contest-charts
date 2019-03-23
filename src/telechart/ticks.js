@@ -92,46 +92,48 @@ export const getTimeTicks = (data: TimeTicksRequest): Tick[] => {
   const monthsDiff = daysDiff / 24;
   const yearsDiff = monthsDiff / 12;
 
-  const widthPerTick = 100;
-  const capacity = Math.floor(data.width / widthPerTick);
+  const widthPerTick = 60;
+  const capacity = Math.max(Math.floor(data.width / widthPerTick), 1);
 
   let size = 0;
-  let step = 0;
+  let scaleDiff = 0;
   let format: ?(number) => string;
 
   if (yearsDiff > capacity) {
     size = 1000 * 60 * 60 * 24 * 31 * 12;
-    step = Math.round(yearsDiff / capacity);
+    scaleDiff = yearsDiff;
     format = formatYear;
   } else if (monthsDiff > capacity) {
     size = 1000 * 60 * 60 * 24 * 31;
-    step = Math.round(monthsDiff / capacity);
+    scaleDiff = monthsDiff;
     format = formatMonth;
   } else if (daysDiff > capacity) {
     size = 1000 * 60 * 60 * 24;
-    step = Math.round(daysDiff / capacity);
+    scaleDiff = daysDiff;
     format = formatDay;
   } else if (hoursDiff > capacity) {
     size = 1000 * 60 * 60;
-    step = Math.round(hoursDiff / capacity);
+    scaleDiff = hoursDiff;
     format = formatHour;
   } else if (minutesDiff > capacity) {
     size = 1000 * 60;
-    step = Math.round(minutesDiff / capacity);
+    scaleDiff = minutesDiff;
     format = formatMinute;
   } else if (secondsDiff > capacity) {
     size = 1000;
-    step = Math.round(secondsDiff / capacity);
+    scaleDiff = secondsDiff;
     format = formatSecond;
   } else {
     size = 1;
-    step = Math.round(diff / capacity);
+    scaleDiff = diff;
     format = formatMillisecond;
   }
 
   if (!format) {
     return [];
   }
+
+  const step = Math.pow(2, Math.ceil(Math.log2(scaleDiff / capacity)));
 
   const ticks: Tick[] = [];
 
