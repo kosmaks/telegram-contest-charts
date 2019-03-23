@@ -4,7 +4,7 @@ import { CanvasRenderer, type Frame } from "./canvas-renderer";
 import { Module, type State, getMaxX, getMinX, getXScale } from "./common";
 import { Popup } from "./popup";
 import { type Store } from "./store";
-import { clamp, findClosestIdx } from "./helpers";
+import { clamp, findClosestIdx, toggleClass } from "./helpers";
 import { getTimeTicks, getValueTicks } from "./ticks";
 
 const DPR = (window.devicePixelRatio: number) || 1;
@@ -34,6 +34,7 @@ export class MainGraphModule extends Module {
     title.className = "tc-main-graph-title";
     container.appendChild(title);
     title.innerHTML = state.name;
+    this.title = title;
 
     const rect = state.containerEl.getBoundingClientRect();
     const canvas = document.createElement("canvas");
@@ -114,11 +115,17 @@ export class MainGraphModule extends Module {
   }
 
   render(state: State) {
-    const { renderer, canvas, container, popup } = this;
+    const { title, renderer, canvas, container, popup } = this;
 
-    if (!canvas || !container || !popup || !renderer) {
+    if (!canvas || !container || !popup || !renderer || !title) {
       return;
     }
+
+    if (title.innerHTML !== state.name) {
+      title.innerHTML = state.name;
+    }
+
+    title.className = toggleClass(title.className, "tc-dark", state.darkTheme);
 
     popup.render(state, container);
 
