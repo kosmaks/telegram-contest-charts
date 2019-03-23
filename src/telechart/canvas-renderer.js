@@ -155,10 +155,7 @@ export class CanvasRenderer {
     const cx = this.xToScreen(frame.primaryAxis.data[idx]);
     ctx.beginPath();
     ctx.moveTo(cx, frame.paddingTop * DPR);
-    ctx.lineTo(
-      cx,
-      canvas.height - (frame.paddingBottom + frame.paddingTop) * DPR
-    );
+    ctx.lineTo(cx, canvas.height - frame.paddingBottom * DPR);
     ctx.globalAlpha = frame.darkTheme ? 0.1 : 1;
     ctx.strokeStyle = frame.darkTheme ? "#FFFFFF" : "#F0F0F0";
     ctx.lineWidth = DPR;
