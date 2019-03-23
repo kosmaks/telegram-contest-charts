@@ -13,11 +13,6 @@ const charts = chartData.map((data, i) => {
   const chart = createLineChart(element, {
     name: `Graph ${i + 1}`,
     columns: data.columns,
-    // columns: data.columns.map(x =>
-    //   x
-    //     .slice(0, Math.round(x.length * 0.3))
-    //     .concat(x.slice(Math.round(x.length * 0.7), -1))
-    // ),
     types: data.types,
     names: data.names,
     colors: data.colors
