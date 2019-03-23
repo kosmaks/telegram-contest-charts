@@ -1,5 +1,6 @@
 // @flow
 
+import { cutLarge } from "./numbers";
 import {
   formatDay,
   formatHour,
@@ -71,7 +72,7 @@ export const getValueTicks = (data: ValueTicksRequest): TicksResponse => {
     result.push({
       id: String(value),
       position: value,
-      label: String(value)
+      label: cutLarge(value)
     });
   }
 

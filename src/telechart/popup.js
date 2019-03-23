@@ -2,6 +2,7 @@
 
 import { type State } from "./common";
 import { clamp, min, toggleClass } from "./helpers";
+import { commaSeparated } from "./numbers";
 import { formatPreviewDate } from "./date";
 
 export class Popup {
@@ -39,7 +40,7 @@ export class Popup {
           const value = state.hover ? axis.data[state.hover.idx] : 0;
           return (
             `<div class="tc-popup-value" style="color: ${axis.color}">` +
-            `<div>${value}</div>` +
+            `<div>${commaSeparated(value)}</div>` +
             axis.name +
             "</div>"
           );
