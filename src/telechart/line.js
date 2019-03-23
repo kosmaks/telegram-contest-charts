@@ -13,6 +13,7 @@ interface Options {
   types?: mixed;
   names?: mixed;
   colors?: mixed;
+  name?: mixed;
 }
 
 interface ChartAPI {
@@ -83,6 +84,7 @@ export const createLineChart = (
 
   const store = createStore(
     ({
+      name: typeof options.name === "string" ? options.name : "Graph",
       mainHeight: 300,
       containerEl,
       lineAxes,

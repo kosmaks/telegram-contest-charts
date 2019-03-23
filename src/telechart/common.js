@@ -15,6 +15,7 @@ export interface LineAxis {
 }
 
 export interface State {
+  name: string;
   mainHeight: number;
   containerEl: HTMLElement;
   lineAxes: LineAxis[];

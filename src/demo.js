@@ -5,12 +5,13 @@ import chartData from "./chart_data.json";
 
 const container = document.getElementById("container");
 
-const charts = chartData.map(data => {
+const charts = chartData.map((data, i) => {
   const element = document.createElement("div");
   element.className = "chart";
   container.appendChild(element);
 
   const chart = createLineChart(element, {
+    name: `Graph ${i + 1}`,
     columns: data.columns,
     // columns: data.columns.map(x =>
     //   x

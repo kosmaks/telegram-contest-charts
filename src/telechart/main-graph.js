@@ -12,6 +12,7 @@ const DPR = (window.devicePixelRatio: number) || 1;
 export class MainGraphModule extends Module {
   canvas: ?HTMLCanvasElement;
   container: ?HTMLDivElement;
+  title: ?HTMLDivElement;
   popup: ?Popup;
   renderer: ?CanvasRenderer;
 
@@ -28,6 +29,11 @@ export class MainGraphModule extends Module {
     container.style.height = state.mainHeight + "px";
     this.container = container;
     this.container.className = "tc-main-graph";
+
+    const title = document.createElement("div");
+    title.className = "tc-main-graph-title";
+    container.appendChild(title);
+    title.innerHTML = state.name;
 
     const rect = state.containerEl.getBoundingClientRect();
     const canvas = document.createElement("canvas");

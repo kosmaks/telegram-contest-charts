@@ -93,7 +93,8 @@ export class CanvasRenderer {
     const { currentFrame: frame, canvas } = this;
     return (
       (1 - (val - this.minY.get()) / this.yScale.get()) *
-      (canvas.height - frame.paddingTop * DPR - frame.paddingBottom * DPR)
+        (canvas.height - frame.paddingTop * DPR - frame.paddingBottom * DPR) +
+      frame.paddingTop * DPR
     );
   }
 
@@ -205,7 +206,7 @@ export class CanvasRenderer {
     ctx.font = `${12 * DPR}px sans-serif`;
     ctx.textAlign = "center";
     this.timeTicks.forEach((tick, fading) => {
-      const cy = canvas.height - frame.paddingBottom * DPR;
+      const cy = canvas.height - frame.paddingBottom * DPR + 14 * DPR;
       const cx = this.xToScreen(tick.position);
       ctx.globalAlpha = (frame.darkTheme ? 0.15 : 1) * fading.opacity;
       ctx.fillText(tick.label, cx, cy);
