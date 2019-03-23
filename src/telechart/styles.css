@@ -192,6 +192,14 @@
   opacity: 0;
   display: none;
 }
+.tc-dark.tc-toggler:after,
+.tc-dark.tc-toggler:before {
+  background: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0),
+    rgba(255, 255, 255, 0.5)
+  );
+}
 :not(.tc-toggler--active).tc-toggler--manual.tc-toggler:before {
   display: block;
 }
@@ -240,6 +248,10 @@
 .tc-toggler--active .tc-toggler-point:before {
   margin-top: -10px;
   margin-left: -10px;
+}
+.tc-dark .tc-toggler-point:after,
+.tc-dark .tc-toggler-point:before {
+  border-color: #fff;
 }
 :not(.tc-toggler--active).tc-toggler--manual .tc-toggler-point:before {
   display: block;
