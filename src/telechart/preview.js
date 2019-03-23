@@ -5,7 +5,7 @@ import { type LineAxis, type State } from "./common";
 
 const DPR = (window.devicePixelRatio: number) || 1;
 
-const ANIMATION_DURATION = 150;
+const ANIMATION_DURATION = 100;
 
 export class Preview {
   canvas: HTMLCanvasElement;
