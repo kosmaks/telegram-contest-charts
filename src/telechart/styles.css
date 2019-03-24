@@ -109,7 +109,7 @@
   font-size: 12px;
   margin-top: 6px;
   margin-right: 1%;
-  flex: 1 1 48%;
+  flex: 1 1 auto;
 }
 
 .tc-popup-value div {

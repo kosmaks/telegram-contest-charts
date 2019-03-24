@@ -244,11 +244,11 @@ export class SliderModule extends Module {
     const rect = elements.container.getBoundingClientRect();
     elements.preview.render(state, rect.width, rect.height);
 
-    const leftPercent = (state.slice.start * 100).toFixed(2) + "%";
-    const rightPercent = (state.slice.end * 100).toFixed(2) + "%";
-    const invRightPercent = ((1 - state.slice.end) * 100).toFixed(2) + "%";
+    const leftPercent = (state.slice.start * 100).toFixed(3) + "%";
+    const rightPercent = (state.slice.end * 100).toFixed(3) + "%";
+    const invRightPercent = ((1 - state.slice.end) * 100).toFixed(3) + "%";
     const width =
-      ((state.slice.end - state.slice.start) * 100).toFixed(2) + "%";
+      ((state.slice.end - state.slice.start) * 100).toFixed(3) + "%";
 
     elements.leftCover.style.width = leftPercent;
     elements.rightCover.style.width = invRightPercent;

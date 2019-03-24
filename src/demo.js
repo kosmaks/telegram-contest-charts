@@ -1,4 +1,5 @@
 import "./demo.css";
+import "@babel/polyfill";
 
 import { createLineChart } from "./telechart/line";
 import chartData from "./chart_data.json";
